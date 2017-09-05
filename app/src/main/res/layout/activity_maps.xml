@@ -1,5 +1,6 @@
 <RelativeLayout
 
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_height="match_parent">
@@ -8,20 +9,30 @@
         android:id="@+id/TF_location"
         android:layout_width="290dp"
         android:layout_height="45dp"
-        android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Name"
+        android:layout_alignEnd="@+id/B_loo"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:ems="10"
+        android:fontFamily="serif"
+        android:inputType="textPersonName"
+        android:text="@string/location"
+        android:textAlignment="center"
+        android:textStyle="italic"
+        android:typeface="serif"
+        tools:ignore="LabelFor"
+        tools:text="zoeken in maps" />
 
     <Button
         android:id="@+id/B_search"
-        android:layout_width="100dp"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="90dp"
         android:layout_height="45dp"
-        android:layout_alignParentTop="true"
+        android:layout_alignBaseline="@+id/TF_location"
+        android:layout_alignBottom="@+id/TF_location"
         android:layout_toEndOf="@+id/TF_location"
+        android:backgroundTint="@color/common_google_signin_btn_text_light_focused"
         android:onClick="onClick"
-        android:text="Search" />
+        android:text="@string/search" />
 
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
@@ -31,55 +42,42 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context="com.example.priyanka.mapsdemo.MapsActivity"
+        tools:context=".MapsActivity"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_below="@+id/B_hopistals" />
+        android:layout_below="@+id/B_wc" />
+
 
     <Button
-        android:id="@+id/B_hopistals"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/TF_location"
-        android:onClick="onClick"
-        android:text="Hospitals" />
-
-    <Button
-        android:id="@+id/B_schools"
+        android:id="@+id/B_wc"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/TF_location"
-        android:layout_toEndOf="@+id/B_hopistals"
+        android:backgroundTint="@android:color/holo_blue_dark"
         android:onClick="onClick"
-        android:text="Schools" />
+        android:text="@string/wc" />
 
     <Button
-        android:id="@+id/B_restaurants"
+        android:id="@+id/B_toilet"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/TF_location"
-        android:layout_toEndOf="@+id/B_schools"
+        android:layout_toEndOf="@+id/B_wc"
+        android:backgroundTint="@android:color/holo_orange_light"
         android:onClick="onClick"
-        android:text="Restautants" />
-
-    <!--<Button-->
-        <!--android:id="@+id/B_to"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignBottom="@+id/B_restaurants"-->
-        <!--android:layout_toEndOf="@+id/B_restaurants"-->
-        <!--android:onClick="onClick"-->
-        <!--android:text="To" />-->
+        android:text="@string/ob_toilet" />
 
     <Button
         android:id="@+id/B_loo"
+        style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/B_restaurants"
-        android:layout_toEndOf="@+id/B_restaurants"
+        android:layout_alignBottom="@+id/B_toilet"
+        android:layout_toEndOf="@+id/B_toilet"
         android:onClick="onClick"
-        android:text="2theloo" />
+        android:text="@string/_2theloo" />
 
 
 </RelativeLayout>

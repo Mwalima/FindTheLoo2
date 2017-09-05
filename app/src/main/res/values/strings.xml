@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">FindTheLoo</string>
     <string name="title_activity_maps">Find the loo</string>
+    <string name="_2theloo">2theloo</string>
+    <string name="location">Location</string>
+    <string name="search">Search</string>
+    <string name="ob_toilet">ob.Toilet</string>
+    <string name="wc">wc</string>
 </resources>
