@@ -26,8 +26,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -47,6 +49,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static final int REQUEST_LOCATION_CODE = 99;
     int PROXIMITY_RADIUS = 10000;
     double latitude,longitude;
+
+    private Marker mLoo;
+    private Marker mWC;
+    private Marker mToilet;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -112,6 +119,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     }
 
+
     @Override
     public void onLocationChanged(Location location) {
 
@@ -125,10 +133,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         Log.d("lat = ",""+latitude);
         LatLng latLng = new LatLng(location.getLatitude() , location.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.title("Current Location");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.title("Current Location");
+            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
+            markerOptions.icon(bitmapDescriptor);
+
+
         currentLocationmMarker = mMap.addMarker(markerOptions);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomBy(10));
@@ -163,8 +175,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         {
                             for(int i = 0;i<addressList.size();i++)
                             {
-                                LatLng latLng = new LatLng(addressList.get(i).getLatitude() , addressList.get(i).getLongitude());
+                                //set the latlong bounds
+                                LatLng latlng1 = new LatLng(53.583333, 7.2);
+                                LatLng latlng2 = new LatLng(52.1666665, 5.1666665);
+                                LatLngBounds allowedBounds = new LatLngBounds(latlng1,latlng2);
+
+                                //set the marker
                                 MarkerOptions markerOptions = new MarkerOptions();
+                                LatLng latLng = new LatLng(addressList.get(i).getLatitude() , addressList.get(i).getLongitude());
                                 markerOptions.position(latLng);
                                 markerOptions.title(location);
                                 mMap.addMarker(markerOptions);
@@ -177,35 +195,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 }
                 break;
-            case R.id.B_hopistals:
+            case R.id.B_wc:
                 mMap.clear();
-                String hospital = "hospital";
-                String url = getUrl(latitude, longitude, hospital);
+                String wc = "wc+in+winkel%7Cwc+in+cafe%7Cwc+in+restaurant+%7C+nu+open";
+                String url = getUrl(latitude, longitude, wc);
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
-
                 getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapsActivity.this, "Showing Nearby Hospitals", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapsActivity.this, "Showing Nearby wc", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.B_schools:
+            case R.id.B_toilet:
                 mMap.clear();
-                String school = "school";
-                url = getUrl(latitude, longitude, school);
+                String toilet = "toilet";
+                url = getUrl(latitude, longitude, toilet);
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
-
                 getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapsActivity.this, "Showing Nearby Schools", Toast.LENGTH_SHORT).show();
-                break;
-            case R.id.B_restaurants:
-                mMap.clear();
-                String resturant = "restuarant";
-                url = getUrl(latitude, longitude, resturant);
-                dataTransfer[0] = mMap;
-                dataTransfer[1] = url;
-
-                getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapsActivity.this, "Showing Nearby Restaurants", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapsActivity.this, "Showing Nearby toilets", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.B_loo:
                 mMap.clear();
@@ -213,11 +219,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 url = getUrl(latitude, longitude, loo);
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
-
                 getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapsActivity.this, "Showing Nearby Loo`s", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapsActivity.this, "Showing Nearby 2theloo", Toast.LENGTH_SHORT).show();
                 break;
-
         }
     }
 
@@ -225,6 +229,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String getUrl(double latitude , double longitude , String nearbyPlace)
     {
 
+//        latitude = 52.4;
+//        longitude =4.5;
         StringBuilder googlePlaceUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
         googlePlaceUrl.append("location="+latitude+","+longitude);
         googlePlaceUrl.append("&radius="+PROXIMITY_RADIUS);
