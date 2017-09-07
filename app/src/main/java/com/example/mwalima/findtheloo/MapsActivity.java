@@ -225,6 +225,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    public void onButtonClick(View v){
+        switch(v.getId()) {
+            case R.id.B_wc:
+                //Inform the user the button1 has been clicked
+                Toast.makeText(MapsActivity.this, "B_wc clicked.", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.B_toilet:
+                //Inform the user the button2 has been clicked
+                Toast.makeText(MapsActivity.this, "B_toilet clicked.", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.B_loo:
+                Toast.makeText(MapsActivity.this, "B_toilet clicked.", Toast.LENGTH_SHORT).show();
+                break;
+        }
+    }
 
     private String getUrl(double latitude , double longitude , String nearbyPlace)
     {
