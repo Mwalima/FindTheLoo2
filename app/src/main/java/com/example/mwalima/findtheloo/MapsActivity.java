@@ -99,17 +99,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+//        LatLng DenHaag = new LatLng(-52.078663, 4.288788);
+//        mMap.addMarker(new MarkerOptions().position(DenHaag).title("Marker in Den Haag"));
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(DenHaag,10.2f));
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             bulidGoogleApiClient();
             mMap.setMyLocationEnabled(true);
         }
     }
 
-
     protected synchronized void bulidGoogleApiClient() {
         client = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
         client.connect();
-
     }
 
     @Override
@@ -121,14 +122,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if(currentLocationmMarker != null)
         {
             currentLocationmMarker.remove();
-
         }
-        Log.d("lat = ",""+latitude);
+        Log.d("lat = ","" + latitude);
         LatLng latLng = new LatLng(location.getLatitude() , location.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title("Current Location");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW));
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
         currentLocationmMarker = mMap.addMarker(markerOptions);
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.zoomBy(10));
@@ -177,35 +177,56 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 }
                 break;
-            case R.id.B_hospitals:
+            case R.id.B_supermarkten:
                 mMap.clear();
-                String hospital = "hospital";
-                String url = getUrl(latitude, longitude, hospital);
+                String supermarkten = "supermarkten";
+                String url = getUrl(latitude, longitude, supermarkten);
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
 
                 getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapsActivity.this, "Showing Nearby Hospitals", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapsActivity.this, "Toon dichtsbijzijnde supermarkten", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.B_schools:
+            case R.id.B_cafe:
                 mMap.clear();
-                String school = "school";
-                url = getUrl(latitude, longitude, school);
+                String cafe = "cafe";
+                url = getUrl(latitude, longitude, cafe);
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
 
                 getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapsActivity.this, "Showing Nearby Schools", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapsActivity.this, "Toon dichtsbijzijnde cafe`s", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.B_restaurants:
                 mMap.clear();
-                String resturant = "restuarant";
-                url = getUrl(latitude, longitude, resturant);
+                String restaurant = "restaurant";
+                url = getUrl(latitude, longitude, restaurant);
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
 
                 getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapsActivity.this, "Showing Nearby Restaurants", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapsActivity.this, "Toon dichtsbijzijnde restaurants", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.B_mcdonalds:
+                mMap.clear();
+                String mcdonalds = "mcdonalds";
+                url = getUrl(latitude, longitude, mcdonalds);
+                dataTransfer[0] = mMap;
+                dataTransfer[1] = url;
+
+                getNearbyPlacesData.execute(dataTransfer);
+                Toast.makeText(MapsActivity.this, "Toon dichtsbijzijnde mcdonalds", Toast.LENGTH_SHORT).show();
+                break;
+
+            case R.id.B_urinoir:
+                mMap.clear();
+                String urinoir = "urinoir";
+                url = getUrl(latitude, longitude, urinoir);
+                dataTransfer[0] = mMap;
+                dataTransfer[1] = url;
+
+                getNearbyPlacesData.execute(dataTransfer);
+                Toast.makeText(MapsActivity.this, "Toon dichtsbijzijnde urinoir`s (mannen alleen)", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.B_loo:
                 mMap.clear();
@@ -215,7 +236,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 dataTransfer[1] = url;
 
                 getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapsActivity.this, "Showing Nearby Loo`s", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapsActivity.this, "Toon dichtsbijzijnde 2theloo", Toast.LENGTH_SHORT).show();
                 break;
 
         }
@@ -229,7 +250,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         googlePlaceUrl.append("&radius="+PROXIMITY_RADIUS);
         googlePlaceUrl.append("&type="+nearbyPlace);
         googlePlaceUrl.append("&sensor=true");
-        googlePlaceUrl.append("&key="+"AIzaSyBLEPBRfw7sMb73Mr88L91Jqh3tuE4mKsE");
+        googlePlaceUrl.append("&key="+"AIzaSyAJoOx0JY5g9GGVNRdVuocOed5UuoMipgQ");
 
         Log.d("MapsActivity", "url = "+googlePlaceUrl.toString());
 

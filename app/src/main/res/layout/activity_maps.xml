@@ -36,56 +36,79 @@
         tools:context="com.example.priyanka.mapsdemo.MapsActivity"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        android:layout_below="@+id/B_hospitals" />
+        android:layout_below="@+id/B_supermarkten" />
 
     <Button
-        android:id="@+id/B_hospitals"
+        android:id="@+id/B_supermarkten"
+        style="@style/Widget.AppCompat.Button.Small"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/onFocus"
+        android:layout_toStartOf="@+id/B_restaurants"
+        android:onClick="onClick"
+        android:text="Supermarkten"
+        android:textSize="8sp" />
+
+    <Button
+        android:id="@+id/B_urinoir"
+        style="@style/Widget.AppCompat.Button.Small"
+        android:layout_width="wrap_content"
+
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/onFocus"
-        android:layout_marginStart="15dp"
         android:onClick="onClick"
-        android:text="Ziekenhuis" />
+        android:text="Urinoirs"
+        android:textSize="8sp" />
 
     <Button
-        android:id="@+id/B_schools"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/B_restaurants"
-        android:layout_alignBottom="@+id/B_restaurants"
-        android:layout_toEndOf="@+id/B_hospitals"
-        android:onClick="onClick"
-        android:text="Cafe" />
-
-    <Button
-        android:id="@+id/B_restaurants"
+        android:id="@+id/B_cafe"
+        style="@style/Widget.AppCompat.Button.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/onFocus"
-        android:layout_toStartOf="@+id/B_search"
+        android:layout_toEndOf="@+id/B_urinoir"
         android:onClick="onClick"
-        android:text="Rest." />
+        android:text="Cafe"
+        android:textSize="8sp" />
 
-    <!--<Button-->
-        <!--android:id="@+id/B_to"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_alignBottom="@+id/B_restaurants"-->
-        <!--android:layout_toEndOf="@+id/B_restaurants"-->
-        <!--android:onClick="onClick"-->
-        <!--android:text="To" />-->
+    <Button
+        android:id="@+id/B_mcdonalds"
+        style="@style/Widget.AppCompat.Button.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/onFocus"
+        android:layout_toEndOf="@+id/B_cafe"
+        android:onClick="onClick"
+        android:text="Mcdonalds"
+        android:textSize="8sp" />
+
+
+    <Button
+        android:id="@+id/B_restaurants"
+        style="@style/Widget.AppCompat.Button.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/B_supermarkten"
+        android:layout_alignBottom="@+id/B_supermarkten"
+        android:layout_toStartOf="@+id/B_loo"
+        android:autoSizeMaxTextSize="@android:dimen/dialog_min_width_major"
+        android:onClick="onClick"
+        android:text="Rest."
+        android:textSize="8sp" />
 
     <Button
         android:id="@+id/B_loo"
         style="@style/Widget.AppCompat.Button.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/B_cafe"
+        android:layout_alignBottom="@+id/B_cafe"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/B_search"
         android:focusedByDefault="true"
         android:onClick="onClick"
-        android:text="2theloo" />
+        android:text="2theloo"
+        android:textSize="8sp" />
 
 
 </RelativeLayout>
