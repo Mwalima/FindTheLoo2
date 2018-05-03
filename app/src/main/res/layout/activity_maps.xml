@@ -33,7 +33,7 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context="com.example.priyanka.mapsdemo.MapsActivity"
+        tools:context="com.example.mapwithmarker.MapsActivity"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
         android:layout_below="@+id/B_supermarkten" />
@@ -46,14 +46,13 @@
         android:layout_below="@+id/onFocus"
         android:layout_toStartOf="@+id/B_restaurants"
         android:onClick="onClick"
-        android:text="Supermarkten"
+        android:text="Supermarkt"
         android:textSize="8sp" />
 
     <Button
         android:id="@+id/B_urinoir"
         style="@style/Widget.AppCompat.Button.Small"
         android:layout_width="wrap_content"
-
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/onFocus"
