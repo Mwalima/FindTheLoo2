@@ -51,6 +51,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     int PROXIMITY_RADIUS = 10000;
     double latitude,longitude;
     private LocationManager locationManager;
+    double latitudesearch,longtitudesearch;
 
 
 
@@ -123,41 +124,39 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     protected synchronized void buildGoogleApiClient() {
-        client = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
+        client = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
         client.connect();
     }
 
 
     @Override
     public void onLocationChanged(Location location) {
-
-        latitude = location.getLatitude();
-        longitude = location.getLongitude();
         lastlocation = location;
-        if(currentLocationmMarker != null)
-        {
+        if (currentLocationmMarker != null) {
             currentLocationmMarker.remove();
         }
-        Log.d("lat = ","" + latitude);
-        LatLng latLng = new LatLng(location.getLatitude() , location.getLongitude());
-
+        //Place current location marker
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
-        markerOptions.title("Current Location");
+        markerOptions.title("Current Position");
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
         currentLocationmMarker = mMap.addMarker(markerOptions);
+
         //move map camera
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+        // Set a preference for minimum and maximum zoom.
+        mMap.setMinZoomPreference(6.0f);
+        mMap.setMaxZoomPreference(19.0f);
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng , 17.0f) ); // 10 is padding
+        //mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
 
-        if(client != null)
-        {
-            LocationServices.FusedLocationApi.removeLocationUpdates(client,this);
+        //stop location updates
+        if (client != null) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(client, this);
         }
+        Log.d("CURRENTLOCATION = ","" + latLng);
+        //Log.d("lat = ","" + latitude);
     }
 
     public void onClick(View v)
@@ -167,11 +166,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         switch(v.getId())
         {
+
             case R.id.B_search:
                 EditText tf_location =  findViewById(R.id.onFocus);
                 String location = tf_location.getText().toString();
-                List<Address> addressList;
 
+                List<Address> addressList;
 
                 if(!location.equals(""))
                 {
@@ -182,6 +182,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         if(addressList != null)
                         {
+
                             for(int i = 0; i < addressList.size();i++)
                             {
                                 LatLng latLng = new LatLng(addressList.get(i).getLatitude() , addressList.get(i).getLongitude());
@@ -190,7 +191,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 markerOptions.title(location);
                                 mMap.addMarker(markerOptions);
                                 mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                                mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+                                mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+
+                                latitudesearch =addressList.get(i).getLatitude();
+                                longtitudesearch = addressList.get(i).getLongitude();
                             }
                         }
                     } catch (IOException e) {
@@ -200,8 +204,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
             case R.id.B_supermarkten:
                 mMap.clear();
-                String supermarkten = "supermarkten";
-                String url = getUrl(latitude, longitude, supermarkten);
+                String supermarkten = "supermarkt";
+                String url = getUrl(latitudesearch, longtitudesearch, supermarkten);
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
                 getNearbyPlacesData.execute(dataTransfer);
@@ -275,8 +279,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         locationRequest.setInterval(1000);
         locationRequest.setFastestInterval(1000);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION ) == PackageManager.PERMISSION_GRANTED)
-        {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
             LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, this);
         }
     }
