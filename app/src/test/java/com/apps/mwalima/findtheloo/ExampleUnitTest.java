@@ -1,4 +1,4 @@
-package com.example.mwalima.findtheloo;
+package com.apps.mwalima.findtheloo;
 
 import org.junit.Test;
 

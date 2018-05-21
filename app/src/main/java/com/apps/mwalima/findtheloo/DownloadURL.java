@@ -1,4 +1,4 @@
-package com.example.mwalima.findtheloo;
+package com.apps.mwalima.findtheloo;
 
 /**
  * Created by mwalima on 4-9-17.

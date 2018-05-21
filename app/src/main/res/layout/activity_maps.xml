@@ -33,7 +33,7 @@
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context="com.example.mapwithmarker.MapsActivity"
+        tools:context="com.apps.mapwithmarker.MapsActivity"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
         android:layout_below="@+id/B_supermarkten" />

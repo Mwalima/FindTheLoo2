@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.mwalima.findtheloo">
+    package="com.apps.mwalima.findtheloo">
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -14,7 +14,7 @@
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
     <application
-        android:version="1"
+        android:version="2"
         android:versionName="release"
         android:allowBackup="true"
         android:icon="@mipmap/loo_launcher"

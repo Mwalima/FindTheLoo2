@@ -1,4 +1,4 @@
-package com.example.mwalima.findtheloo;
+package com.apps.mwalima.findtheloo;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -149,7 +149,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setMinZoomPreference(6.0f);
         mMap.setMaxZoomPreference(19.0f);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng , 17.0f) ); // 10 is padding
-        //mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
 
         //stop location updates
         if (client != null) {
@@ -163,13 +162,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         Object dataTransfer[] = new Object[2];
         GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData();
+        EditText tf_location =  findViewById(R.id.onFocus);
+        String location = tf_location.getText().toString();
 
         switch(v.getId())
         {
-
             case R.id.B_search:
-                EditText tf_location =  findViewById(R.id.onFocus);
-                String location = tf_location.getText().toString();
+
+
 
                 List<Address> addressList;
 
@@ -178,11 +178,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Geocoder geocoder = new Geocoder(this);
 
                     try {
-                        addressList = geocoder.getFromLocationName(location, 10);
+                        addressList = geocoder.getFromLocationName(location, 5);
 
                         if(addressList != null)
                         {
-
                             for(int i = 0; i < addressList.size();i++)
                             {
                                 LatLng latLng = new LatLng(addressList.get(i).getLatitude() , addressList.get(i).getLongitude());
@@ -190,11 +189,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 markerOptions.position(latLng);
                                 markerOptions.title(location);
                                 mMap.addMarker(markerOptions);
-                                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-                                mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
-
-                                latitudesearch =addressList.get(i).getLatitude();
-                                longtitudesearch = addressList.get(i).getLongitude();
+                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng , 17.0f) );
+                                mMap.animateCamera(CameraUpdateFactory.zoomTo(17),2000,null);
                             }
                         }
                     } catch (IOException e) {
@@ -204,8 +200,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
             case R.id.B_supermarkten:
                 mMap.clear();
-                String supermarkten = "supermarkt";
-                String url = getUrl(latitudesearch, longtitudesearch, supermarkten);
+                String supermarkt = "supermarket";
+                String url = getUrl(lastlocation.getLatitude(), lastlocation.getLongitude(), supermarkt);
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
                 getNearbyPlacesData.execute(dataTransfer);
@@ -214,7 +210,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case R.id.B_cafe:
                 mMap.clear();
                 String cafe = "cafe";
-                url = getUrl(latitude, longitude, cafe);
+                url = getUrl(lastlocation.getLatitude(), lastlocation.getLongitude(),cafe);
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
                 getNearbyPlacesData.execute(dataTransfer);
@@ -223,7 +219,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case R.id.B_restaurants:
                 mMap.clear();
                 String restaurant = "restaurant";
-                url = getUrl(latitude, longitude, restaurant);
+                url = getUrl(lastlocation.getLatitude(), lastlocation.getLongitude(),restaurant);
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
                 getNearbyPlacesData.execute(dataTransfer);
@@ -232,7 +228,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case R.id.B_mcdonalds:
                 mMap.clear();
                 String mcdonalds = "mcdonalds";
-                url = getUrl(latitude, longitude, mcdonalds);
+                url = getUrl(lastlocation.getLatitude(), lastlocation.getLongitude(), mcdonalds);
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
                 getNearbyPlacesData.execute(dataTransfer);
@@ -240,21 +236,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 break;
             case R.id.B_urinoir:
                 mMap.clear();
-                String urinoir = "urinoir";
-                url = getUrl(latitude, longitude, urinoir);
+                String urinoir = "urinal";
+                url = getUrl(lastlocation.getLatitude(), lastlocation.getLongitude(), urinoir);
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
                 getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapsActivity.this, "Toon dichtsbijzijnde urinoir`s (mannen alleen)", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapsActivity.this, "Toon dichtsbijzijnde urinoir`s", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.B_loo:
                 mMap.clear();
-                String loo = "2theloo";
-                url = getUrl(latitude, longitude, loo);
+                String loo = "public toilet";
+                url = getUrl(lastlocation.getLatitude(), lastlocation.getLongitude(), loo);
                 dataTransfer[0] = mMap;
                 dataTransfer[1] = url;
                 getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapsActivity.this, "Toon dichtsbijzijnde 2theloo", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapsActivity.this, "Toon dichtsbijzijnde public toilets", Toast.LENGTH_SHORT).show();
                 break;
         }
     }
@@ -263,7 +259,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         StringBuilder googlePlaceUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
         googlePlaceUrl.append("location=" + latitude + "," + longitude);
-        googlePlaceUrl.append("&radius=5000");
+        googlePlaceUrl.append("&radius=1000");
         googlePlaceUrl.append("&types="+ nearbyPlace);
         googlePlaceUrl.append("&sensor=true");
         googlePlaceUrl.append("&key="+"AIzaSyBN62Vax75G8e5KbX_72_PeLvi2J5u1AJ4");
@@ -273,8 +269,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onConnected(@Nullable Bundle bundle) {
-
+    public void onConnected(@Nullable Bundle bundle){
         locationRequest = new LocationRequest();
         locationRequest.setInterval(1000);
         locationRequest.setFastestInterval(1000);
@@ -291,7 +286,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         if(ContextCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)  != PackageManager.PERMISSION_GRANTED )
         {
-
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION))
             {
                 ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.ACCESS_FINE_LOCATION },REQUEST_LOCATION_CODE);
@@ -301,7 +295,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 ActivityCompat.requestPermissions(this,new String[] {Manifest.permission.ACCESS_FINE_LOCATION },REQUEST_LOCATION_CODE);
             }
             return false;
-
         }
         else
             return true;
