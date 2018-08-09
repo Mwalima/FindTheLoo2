@@ -21,6 +21,7 @@ import android.location.Criteria;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -52,6 +53,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     double latitude,longitude;
     private LocationManager locationManager;
     double latitudesearch,longtitudesearch;
+    private FusedLocationProviderClient mFusedLocationProviderClient;
 
 
 
@@ -68,6 +70,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        // Construct a FusedLocationProviderClient.
+        mFusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this);
 
     }
 
@@ -264,7 +268,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         googlePlaceUrl.append("&sensor=true");
         googlePlaceUrl.append("&key="+"AIzaSyBN62Vax75G8e5KbX_72_PeLvi2J5u1AJ4");
 
-        Log.d("MapsActivity", "url = "+googlePlaceUrl.toString());
+        //Log.d("MapsActivity", "url = "+googlePlaceUrl.toString());
         return googlePlaceUrl.toString();
     }
 
