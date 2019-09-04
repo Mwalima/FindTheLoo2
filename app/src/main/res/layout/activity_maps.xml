@@ -16,14 +16,12 @@
         android:layout_marginLeft="7dp"
         android:layout_marginTop="5dp"
         android:layout_marginBottom="10dp"
-        android:background="@color/browser_actions_bg_grey"
         android:ems="10"
         android:hint="Type the name of the location"
         android:inputType="textPersonName" />
 
     <Button
         android:id="@+id/B_search"
-
         style="@android:style/Widget.Button"
         android:layout_width="100dp"
         android:layout_height="45dp"
@@ -49,7 +47,6 @@
 
     <Button
         android:id="@+id/B_supermarkten"
-
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/onFocus"
@@ -72,7 +69,6 @@
 
     <Button
         android:id="@+id/B_cafe"
-
         style="@android:style/Widget.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -84,7 +80,6 @@
 
     <Button
         android:id="@+id/B_mcdonalds"
-
         style="@android:style/Widget.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -97,7 +92,6 @@
 
     <Button
         android:id="@+id/B_restaurants"
-
         style="@android:style/Widget.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -109,7 +103,6 @@
 
     <Button
         android:id="@+id/B_loo"
-
         style="@android:style/Widget.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
