@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.location.Criteria;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -33,7 +32,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
 
 import java.io.IOException;
 import java.util.List;
@@ -168,8 +166,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         {
             case R.id.B_search:
 
-
-
                 List<Address> addressList;
 
                 if(!location.equals(""))
@@ -181,6 +177,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         if(addressList != null)
                         {
+
                             for(int i = 0; i < addressList.size();i++)
                             {
                                 LatLng latLng = new LatLng(addressList.get(i).getLatitude() , addressList.get(i).getLongitude());
@@ -261,7 +258,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         googlePlaceUrl.append("&radius=1000");
         googlePlaceUrl.append("&types="+ nearbyPlace);
         googlePlaceUrl.append("&sensor=true");
-        googlePlaceUrl.append("&key="+"AIzaSyBN62Vax75G8e5KbX_72_PeLvi2J5u1AJ4");
+        googlePlaceUrl.append("&key="+"AIzaSyBxo_Umr5453x5ij04DVw-euVKNHxSEWPc");
 
         Log.d("MapsActivity", "url = "+googlePlaceUrl.toString());
         return googlePlaceUrl.toString();
