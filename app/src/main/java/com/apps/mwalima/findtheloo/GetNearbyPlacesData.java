@@ -61,20 +61,18 @@ class GetNearbyPlacesData extends AsyncTask<Object, String, String> {
 
             String placeName = googlePlace.get("place_name");
             String vicinity = googlePlace.get("vicinity");
-            String opening_hours = googlePlace.get("opening_hours");
             double lat = Double.parseDouble( googlePlace.get("lat"));
             double lng = Double.parseDouble( googlePlace.get("lng"));
 
             LatLng latLng = new LatLng( lat, lng);
             markerOptions.position(latLng);
-            markerOptions.title(placeName + " : " + vicinity + " : " + opening_hours);
+            markerOptions.title(placeName);
+            markerOptions.snippet (vicinity);
             markerOptions.icon(BitmapDescriptorFactory.fromResource (R.mipmap.pin2_small));
 
             mMap.addMarker(markerOptions);
             mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-
-
         }
     }
 }

@@ -45,6 +45,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleApiClient client;
     private LocationRequest locationRequest;
     private Location lastlocation;
+    private List<Address> addressList;
+    private double lat;
+    private double lng;
     private Marker currentLocationmMarker;
     public static final int REQUEST_LOCATION_CODE = 99;
     int PROXIMITY_RADIUS = 10000;
@@ -129,9 +132,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onLocationChanged(Location location) {
         lastlocation = location;
+
         if (currentLocationmMarker != null) {
             currentLocationmMarker.remove();
         }
+
         //Place current location marker
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
@@ -160,93 +165,150 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Object dataTransfer[] = new Object[2];
         GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData();
         EditText tf_location =  findViewById(R.id.onFocus);
-        String location = tf_location.getText().toString();
+        String Searchlocation = tf_location.getText().toString();
+
 
         switch(v.getId())
         {
             case R.id.B_search:
-
-                List<Address> addressList;
-
-                if(!location.equals(""))
+                if(!Searchlocation.equals(""))
                 {
                     Geocoder geocoder = new Geocoder(this);
 
                     try {
-                        addressList = geocoder.getFromLocationName(location, 5);
+                        addressList = geocoder.getFromLocationName(Searchlocation, 5);
 
-                        if(addressList != null)
-                        {
+                        for(int i = 0; i < addressList.size (); i++) {
 
-                            for(int i = 0; i < addressList.size();i++)
-                            {
-                                LatLng latLng = new LatLng(addressList.get(i).getLatitude() , addressList.get(i).getLongitude());
-                                MarkerOptions markerOptions = new MarkerOptions();
-                                markerOptions.position(latLng);
-                                markerOptions.title(location);
-                                mMap.addMarker(markerOptions);
-                                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng , 17.0f) );
-                                mMap.animateCamera(CameraUpdateFactory.zoomTo(17),2000,null);
-                            }
+                            LatLng latLng = new LatLng (addressList.get (0).getLatitude (), addressList.get (0).getLongitude ());
+                            lat = addressList.get (0).getLatitude ();
+                            lng = addressList.get (0).getLongitude ();
+                            MarkerOptions markerOptions = new MarkerOptions ();
+                            markerOptions.position (latLng);
+                            markerOptions.title (Searchlocation);
+                            mMap.addMarker (markerOptions);
+                            mMap.moveCamera (CameraUpdateFactory.newLatLngZoom (latLng, 17.0f));
+                            mMap.animateCamera (CameraUpdateFactory.zoomTo (17), 2000, null);
                         }
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
                 break;
             case R.id.B_supermarkten:
-                mMap.clear();
-                String supermarkt = "supermarket";
-                String url = getUrl(lastlocation.getLatitude(), lastlocation.getLongitude(), supermarkt);
-                dataTransfer[0] = mMap;
-                dataTransfer[1] = url;
-                getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapsActivity.this, "Toon dichtsbijzijnde supermarkten", Toast.LENGTH_SHORT).show();
+                if(Searchlocation !=null) {
+                    mMap.clear ();
+                    String supermarkt = "supermarket";
+                    String url = getUrl (lat, lng, supermarkt);
+                    dataTransfer[0] = mMap;
+                    dataTransfer[1] = url;
+                    getNearbyPlacesData.execute (dataTransfer);
+                    Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde supermarkten in "+ Searchlocation, Toast.LENGTH_SHORT).show ();
+                }else {
+                    mMap.clear ();
+                    String supermarkt = "supermarket";
+                    String url = getUrl (lastlocation.getLatitude (), lastlocation.getLongitude (), supermarkt);
+                    dataTransfer[0] = mMap;
+                    dataTransfer[1] = url;
+                    getNearbyPlacesData.execute (dataTransfer);
+                    Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde supermarkten", Toast.LENGTH_SHORT).show ();
+                }
                 break;
             case R.id.B_cafe:
-                mMap.clear();
-                String cafe = "cafe";
-                url = getUrl(lastlocation.getLatitude(), lastlocation.getLongitude(),cafe);
-                dataTransfer[0] = mMap;
-                dataTransfer[1] = url;
-                getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapsActivity.this, "Toon dichtsbijzijnde cafe`s", Toast.LENGTH_SHORT).show();
+                if(Searchlocation !=null) {
+                    mMap.clear ();
+                    String cafe = "cafe";
+                    String url = getUrl (lat, lng, cafe);
+                    dataTransfer[0] = mMap;
+                    dataTransfer[1] = url;
+                    getNearbyPlacesData.execute (dataTransfer);
+                    Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde cafe in "+ Searchlocation, Toast.LENGTH_SHORT).show ();
+                }else {
+                    mMap.clear ();
+                    String cafe = "cafe";
+                    String url = getUrl (lastlocation.getLatitude (), lastlocation.getLongitude (), cafe);
+                    dataTransfer[0] = mMap;
+                    dataTransfer[1] = url;
+                    getNearbyPlacesData.execute (dataTransfer);
+                    Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde cafe`s", Toast.LENGTH_SHORT).show ();
+                }
                 break;
             case R.id.B_restaurants:
-                mMap.clear();
-                String restaurant = "restaurant";
-                url = getUrl(lastlocation.getLatitude(), lastlocation.getLongitude(),restaurant);
-                dataTransfer[0] = mMap;
-                dataTransfer[1] = url;
-                getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapsActivity.this, "Toon dichtsbijzijnde restaurants", Toast.LENGTH_SHORT).show();
+                if(Searchlocation !=null) {
+                    mMap.clear ();
+                    String restaurant = "restaurant";
+                    String url = getUrl (lat, lng, restaurant);
+                    dataTransfer[0] = mMap;
+                    dataTransfer[1] = url;
+                    getNearbyPlacesData.execute (dataTransfer);
+                    Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde restaurant in "+ Searchlocation, Toast.LENGTH_SHORT).show ();
+                }else {
+                    mMap.clear();
+                    String restaurant = "restaurant";
+                    String url = getUrl(lastlocation.getLatitude(), lastlocation.getLongitude(),restaurant);
+                    dataTransfer[0] = mMap;
+                    dataTransfer[1] = url;
+                    getNearbyPlacesData.execute(dataTransfer);
+                    Toast.makeText(MapsActivity.this, "Toon dichtsbijzijnde restaurants", Toast.LENGTH_SHORT).show();
+                }
                 break;
             case R.id.B_mcdonalds:
-                mMap.clear();
-                String mcdonalds = "mcdonalds";
-                url = getUrl(lastlocation.getLatitude(), lastlocation.getLongitude(), mcdonalds);
-                dataTransfer[0] = mMap;
-                dataTransfer[1] = url;
-                getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapsActivity.this, "Toon dichtsbijzijnde mcdonalds", Toast.LENGTH_SHORT).show();
+                if(Searchlocation !=null) {
+                    mMap.clear ();
+                    String mcdonalds = "restaurant&keyword=mcdonalds";
+                    String url = getUrl (lat, lng, mcdonalds);
+                    dataTransfer[0] = mMap;
+                    dataTransfer[1] = url;
+                    getNearbyPlacesData.execute (dataTransfer);
+                    Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde mcdonalds in "+ Searchlocation, Toast.LENGTH_SHORT).show ();
+                }else {
+                    mMap.clear ();
+                    String mcdonalds = "restaurant&keyword=mcdonalds";
+                    String url = getUrl (lastlocation.getLatitude (), lastlocation.getLongitude (), mcdonalds);
+                    dataTransfer[0] = mMap;
+                    dataTransfer[1] = url;
+                    getNearbyPlacesData.execute (dataTransfer);
+                    Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde mcdonalds", Toast.LENGTH_SHORT).show ();
+                }
                 break;
             case R.id.B_urinoir:
-                mMap.clear();
-                String urinoir = "urinal";
-                url = getUrl(lastlocation.getLatitude(), lastlocation.getLongitude(), urinoir);
-                dataTransfer[0] = mMap;
-                dataTransfer[1] = url;
-                getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapsActivity.this, "Toon dichtsbijzijnde urinoir`s", Toast.LENGTH_SHORT).show();
+                if(Searchlocation !=null) {
+                    mMap.clear ();
+                    String urinoir = "urinal";
+                    String url = getUrl (lat, lng, urinoir);
+                    dataTransfer[0] = mMap;
+                    dataTransfer[1] = url;
+                    getNearbyPlacesData.execute (dataTransfer);
+                    Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde urinoir in "+ Searchlocation, Toast.LENGTH_SHORT).show ();
+                }else {
+                    mMap.clear ();
+                    String urinoir = "urinal";
+                    String url = getUrl (lastlocation.getLatitude (), lastlocation.getLongitude (), urinoir);
+                    dataTransfer[0] = mMap;
+                    dataTransfer[1] = url;
+                    getNearbyPlacesData.execute (dataTransfer);
+                    Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde urinoir`s", Toast.LENGTH_SHORT).show ();
+                }
                 break;
             case R.id.B_loo:
-                mMap.clear();
-                String loo = "public toilet";
-                url = getUrl(lastlocation.getLatitude(), lastlocation.getLongitude(), loo);
-                dataTransfer[0] = mMap;
-                dataTransfer[1] = url;
-                getNearbyPlacesData.execute(dataTransfer);
-                Toast.makeText(MapsActivity.this, "Toon dichtsbijzijnde public toilets", Toast.LENGTH_SHORT).show();
+                if(Searchlocation !=null) {
+                    mMap.clear ();
+                    String loo = "public toilet";
+                    String url = getUrl (lat, lng, loo);
+                    dataTransfer[0] = mMap;
+                    dataTransfer[1] = url;
+                    getNearbyPlacesData.execute (dataTransfer);
+                    Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde urinoir in "+ Searchlocation, Toast.LENGTH_SHORT).show ();
+                }else {
+                    mMap.clear ();
+                    String loo = "public toilet";
+                    String url = getUrl (lastlocation.getLatitude (), lastlocation.getLongitude (), loo);
+                    dataTransfer[0] = mMap;
+                    dataTransfer[1] = url;
+                    getNearbyPlacesData.execute (dataTransfer);
+                    Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde public toilets", Toast.LENGTH_SHORT).show ();
+                }
                 break;
         }
     }
@@ -255,8 +317,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         StringBuilder googlePlaceUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
         googlePlaceUrl.append("location=" + latitude + "," + longitude);
-        googlePlaceUrl.append("&radius=1000");
-        googlePlaceUrl.append("&types="+ nearbyPlace);
+        googlePlaceUrl.append("&rankby=distance");
+        googlePlaceUrl.append("&keyword="+ nearbyPlace);
+        googlePlaceUrl.append ("&opennow");
         googlePlaceUrl.append("&sensor=true");
         googlePlaceUrl.append("&key="+"AIzaSyBxo_Umr5453x5ij04DVw-euVKNHxSEWPc");
 
