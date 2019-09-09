@@ -32,8 +32,11 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
@@ -41,6 +44,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
 
+    private static final double EARTH_RADIUS = 6371000;
+    private LatLng latLng;
     private GoogleMap mMap;
     private GoogleApiClient client;
     private LocationRequest locationRequest;
@@ -136,7 +141,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (currentLocationmMarker != null) {
             currentLocationmMarker.remove();
         }
-
         //Place current location marker
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
@@ -160,6 +164,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Log.d("lat = ","" + latitude);
     }
 
+    private LatLng getPoint(LatLng center, int radius, double angle) {
+        // Get the coordinates of a circle point at the given angle
+        double east = radius * Math.cos(angle);
+        double north = radius * Math.sin(angle);
+
+        double cLat = center.latitude;
+        double cLng = center.longitude;
+        double latRadius = EARTH_RADIUS * Math.cos(cLat / 180 * Math.PI);
+
+        double newLat = cLat + (north / EARTH_RADIUS / Math.PI * 180);
+        double newLng = cLng + (east / latRadius / Math.PI * 180);
+
+        return new LatLng(newLat, newLng);
+    }
+
+    public Polygon drawCircle(LatLng center, int radius) {
+        // Clear the map to remove the previous circle
+        mMap.clear();
+        // Generate the points
+        List<LatLng> points = new ArrayList<LatLng> ();
+        int totalPonts = 30; // number of corners of the pseudo-circle
+        for (int i = 0; i < totalPonts; i++) {
+            points.add(getPoint(center, radius, i*2*Math.PI/totalPonts));
+        }
+        // Create and return the polygon
+        return mMap.addPolygon(new PolygonOptions ().addAll(points).strokeWidth(2).strokeColor(0x700a420b));
+    }
+
     public void onClick(View v)
     {
         Object dataTransfer[] = new Object[2];
@@ -180,7 +212,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                         for(int i = 0; i < addressList.size (); i++) {
 
-                            LatLng latLng = new LatLng (addressList.get (0).getLatitude (), addressList.get (0).getLongitude ());
+                            latLng = new LatLng (addressList.get (0).getLatitude (), addressList.get (0).getLongitude ());
                             lat = addressList.get (0).getLatitude ();
                             lng = addressList.get (0).getLongitude ();
                             MarkerOptions markerOptions = new MarkerOptions ();
@@ -197,15 +229,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 break;
             case R.id.B_supermarkten:
-                if(Searchlocation !=null) {
+                if(!Searchlocation.isEmpty ()) {
                     mMap.clear ();
                     String supermarkt = "supermarket";
                     String url = getUrl (lat, lng, supermarkt);
+                    drawCircle(new LatLng (lat,lng), 1000);
                     dataTransfer[0] = mMap;
                     dataTransfer[1] = url;
                     getNearbyPlacesData.execute (dataTransfer);
                     Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde supermarkten in "+ Searchlocation, Toast.LENGTH_SHORT).show ();
-                }else {
+                }
+                if(Searchlocation.isEmpty ()) {
                     mMap.clear ();
                     String supermarkt = "supermarket";
                     String url = getUrl (lastlocation.getLatitude (), lastlocation.getLongitude (), supermarkt);
@@ -216,7 +250,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 break;
             case R.id.B_cafe:
-                if(Searchlocation !=null) {
+                if(!Searchlocation.isEmpty ()) {
                     mMap.clear ();
                     String cafe = "cafe";
                     String url = getUrl (lat, lng, cafe);
@@ -292,14 +326,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 break;
             case R.id.B_loo:
-                if(Searchlocation !=null) {
+                if(Searchlocation !="") {
                     mMap.clear ();
                     String loo = "public toilet";
                     String url = getUrl (lat, lng, loo);
                     dataTransfer[0] = mMap;
                     dataTransfer[1] = url;
                     getNearbyPlacesData.execute (dataTransfer);
-                    Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde urinoir in "+ Searchlocation, Toast.LENGTH_SHORT).show ();
+                    Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde public toilet in "+ Searchlocation, Toast.LENGTH_SHORT).show ();
                 }else {
                     mMap.clear ();
                     String loo = "public toilet";
@@ -317,7 +351,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     {
         StringBuilder googlePlaceUrl = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
         googlePlaceUrl.append("location=" + latitude + "," + longitude);
-        googlePlaceUrl.append("&rankby=distance");
+        googlePlaceUrl.append("&radius="+1000);
         googlePlaceUrl.append("&keyword="+ nearbyPlace);
         googlePlaceUrl.append ("&opennow");
         googlePlaceUrl.append("&sensor=true");
