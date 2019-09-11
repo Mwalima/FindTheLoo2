@@ -2,12 +2,14 @@ package com.apps.mwalima.findtheloo;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -21,23 +23,29 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
@@ -51,14 +59,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationRequest locationRequest;
     private Location lastlocation;
     private List<Address> addressList;
+    private LocationListener mListener;
     private double lat;
     private double lng;
     private Marker currentLocationmMarker;
     public static final int REQUEST_LOCATION_CODE = 99;
-    int PROXIMITY_RADIUS = 10000;
-    double latitude,longitude;
     private LocationManager locationManager;
-    double latitudesearch,longtitudesearch;
+    private FusedLocationProviderClient mFusedLocationClient;
+
+
 
 
 
@@ -66,11 +75,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        {
-            checkLocationPermission();
-        }
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager ()
                     .findFragmentById (R.id.map);
             mapFragment.getMapAsync (this);
@@ -99,6 +105,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume ();
+        if (client != null && mFusedLocationClient != null) {
+            requestLocationUpdates();
+        } else {
+            buildGoogleApiClient();
+        }
+    }
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -118,79 +133,86 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             if (ContextCompat.checkSelfPermission(this,
                     Manifest.permission.ACCESS_FINE_LOCATION)
                     == PackageManager.PERMISSION_GRANTED) {
-                buildGoogleApiClient();
+                mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
                 mMap.setMyLocationEnabled(true);
+            }else{
+                checkLocationPermission ();
             }
         }
         else {
-            buildGoogleApiClient();
+            mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
             mMap.setMyLocationEnabled(true);
         }
     }
 
     protected synchronized void buildGoogleApiClient() {
-        client = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(LocationServices.API).build();
+        client = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API).build();
         client.connect();
     }
+
+    LocationCallback locationCallback = new LocationCallback() {
+        @Override
+        public void onLocationResult(LocationResult locationResult) {
+            List<Location> locationList = locationResult.getLocations ();
+            Object dataTransfer[] = new Object[2];
+            GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData();
+
+
+            if (locationList.size () > 0) {
+                //The last location in the list is the newest
+                Location location = locationList.get (locationList.size () - 1);
+                Log.i ("MapsActivity", "Location: " + location.getLatitude () + " " + location.getLongitude ());
+                lastlocation = location;
+                if (currentLocationmMarker != null) {
+                    currentLocationmMarker.remove ();
+                }
+
+                //Place current location marker
+                LatLng latLng = new LatLng (location.getLatitude (), location.getLongitude ());
+                MarkerOptions markerOptions = new MarkerOptions ();
+                markerOptions.position (latLng);
+                markerOptions.title ("Current Position");
+                markerOptions.icon (BitmapDescriptorFactory.defaultMarker (BitmapDescriptorFactory.HUE_RED));
+                currentLocationmMarker = mMap.addMarker (markerOptions);
+
+                mMap.clear ();
+                mMap.addCircle (
+                        new CircleOptions ()
+                                .center (latLng)
+                                .radius (500.0)
+                                .strokeWidth (3f)
+                                .strokeColor (Color.RED)
+                                .fillColor (Color.argb (70,150,50,50))
+                );
+                String all = "cafe&restaurant&mcdonalds&supermarket&public+toilet";
+                String url = getUrl (location.getLatitude (), location.getLongitude (), all);
+                dataTransfer[0] = mMap;
+                dataTransfer[1] = url;
+                getNearbyPlacesData.execute (dataTransfer);
+                Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde mogelijkheden", Toast.LENGTH_SHORT).show ();
+
+                mMap.moveCamera (CameraUpdateFactory.newLatLngZoom (latLng, 15));
+            }
+        }
+    };
 
 
     @Override
     public void onLocationChanged(Location location) {
-        lastlocation = location;
-
-        if (currentLocationmMarker != null) {
-            currentLocationmMarker.remove();
-        }
-        //Place current location marker
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        markerOptions.title("Current Position");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-        currentLocationmMarker = mMap.addMarker(markerOptions);
-
-        //move map camera
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        // Set a preference for minimum and maximum zoom.
-        mMap.setMinZoomPreference(6.0f);
-        mMap.setMaxZoomPreference(19.0f);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng , 17.0f) ); // 10 is padding
-
-        //stop location updates
-        if (client != null) {
-            LocationServices.FusedLocationApi.removeLocationUpdates(client, this);
-        }
-        Log.d("CURRENTLOCATION = ","" + latLng);
-        //Log.d("lat = ","" + latitude);
+      lastlocation=location;
     }
 
-    private LatLng getPoint(LatLng center, int radius, double angle) {
-        // Get the coordinates of a circle point at the given angle
-        double east = radius * Math.cos(angle);
-        double north = radius * Math.sin(angle);
-
-        double cLat = center.latitude;
-        double cLng = center.longitude;
-        double latRadius = EARTH_RADIUS * Math.cos(cLat / 180 * Math.PI);
-
-        double newLat = cLat + (north / EARTH_RADIUS / Math.PI * 180);
-        double newLng = cLng + (east / latRadius / Math.PI * 180);
-
-        return new LatLng(newLat, newLng);
-    }
-
-    public Polygon drawCircle(LatLng center, int radius) {
-        // Clear the map to remove the previous circle
-        mMap.clear();
-        // Generate the points
-        List<LatLng> points = new ArrayList<LatLng> ();
-        int totalPonts = 30; // number of corners of the pseudo-circle
-        for (int i = 0; i < totalPonts; i++) {
-            points.add(getPoint(center, radius, i*2*Math.PI/totalPonts));
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mFusedLocationClient != null) {
+            mFusedLocationClient.removeLocationUpdates(locationCallback);
         }
-        // Create and return the polygon
-        return mMap.addPolygon(new PolygonOptions ().addAll(points).strokeWidth(2).strokeColor(0x700a420b));
     }
+
 
     public void onClick(View v)
     {
@@ -198,7 +220,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         GetNearbyPlacesData getNearbyPlacesData = new GetNearbyPlacesData();
         EditText tf_location =  findViewById(R.id.onFocus);
         String Searchlocation = tf_location.getText().toString();
-
 
         switch(v.getId())
         {
@@ -208,7 +229,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Geocoder geocoder = new Geocoder(this);
 
                     try {
-                        addressList = geocoder.getFromLocationName(Searchlocation, 5);
+                        addressList = geocoder.getFromLocationName(Searchlocation, 1);
 
                         for(int i = 0; i < addressList.size (); i++) {
 
@@ -219,10 +240,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             markerOptions.position (latLng);
                             markerOptions.title (Searchlocation);
                             mMap.addMarker (markerOptions);
-                            mMap.moveCamera (CameraUpdateFactory.newLatLngZoom (latLng, 17.0f));
-                            mMap.animateCamera (CameraUpdateFactory.zoomTo (17), 2000, null);
                         }
 
+                        mMap.clear ();
+                        mMap.addCircle (
+                                new CircleOptions ()
+                                        .center (latLng)
+                                        .radius (500.0)
+                                        .strokeWidth (3f)
+                                        .strokeColor (Color.RED)
+                                        .fillColor (Color.argb (70,150,50,50))
+                        );
+                        String all = "cafe&restaurant&mcdonalds&supermarket&public+toilet";
+                        String url = getUrl (lat, lng, all);
+                        dataTransfer[0] = mMap;
+                        dataTransfer[1] = url;
+                        getNearbyPlacesData.execute (dataTransfer);
+                        Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde mogelijkheden in "+ Searchlocation, Toast.LENGTH_SHORT).show ();
+
+                        mMap.moveCamera (CameraUpdateFactory.newLatLngZoom (latLng, 14.0f));
+                        mMap.animateCamera (CameraUpdateFactory.zoomTo (13), 500, null);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -233,7 +270,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     mMap.clear ();
                     String supermarkt = "supermarket";
                     String url = getUrl (lat, lng, supermarkt);
-                    drawCircle(new LatLng (lat,lng), 1000);
                     dataTransfer[0] = mMap;
                     dataTransfer[1] = url;
                     getNearbyPlacesData.execute (dataTransfer);
@@ -258,7 +294,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     dataTransfer[1] = url;
                     getNearbyPlacesData.execute (dataTransfer);
                     Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde cafe in "+ Searchlocation, Toast.LENGTH_SHORT).show ();
-                }else {
+                }
+                if(Searchlocation.isEmpty ()) {
                     mMap.clear ();
                     String cafe = "cafe";
                     String url = getUrl (lastlocation.getLatitude (), lastlocation.getLongitude (), cafe);
@@ -269,7 +306,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 break;
             case R.id.B_restaurants:
-                if(Searchlocation !=null) {
+                if(!Searchlocation.isEmpty ()) {
                     mMap.clear ();
                     String restaurant = "restaurant";
                     String url = getUrl (lat, lng, restaurant);
@@ -277,7 +314,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     dataTransfer[1] = url;
                     getNearbyPlacesData.execute (dataTransfer);
                     Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde restaurant in "+ Searchlocation, Toast.LENGTH_SHORT).show ();
-                }else {
+                }
+                if(Searchlocation.isEmpty ()) {
                     mMap.clear();
                     String restaurant = "restaurant";
                     String url = getUrl(lastlocation.getLatitude(), lastlocation.getLongitude(),restaurant);
@@ -288,17 +326,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 break;
             case R.id.B_mcdonalds:
-                if(Searchlocation !=null) {
+                if(!Searchlocation.isEmpty ()) {
                     mMap.clear ();
-                    String mcdonalds = "restaurant&keyword=mcdonalds";
+                    String mcdonalds = "mcdonalds";
                     String url = getUrl (lat, lng, mcdonalds);
                     dataTransfer[0] = mMap;
                     dataTransfer[1] = url;
                     getNearbyPlacesData.execute (dataTransfer);
                     Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde mcdonalds in "+ Searchlocation, Toast.LENGTH_SHORT).show ();
-                }else {
+                }
+                if(Searchlocation.isEmpty ()) {
                     mMap.clear ();
-                    String mcdonalds = "restaurant&keyword=mcdonalds";
+                    String mcdonalds = "mcdonalds";
                     String url = getUrl (lastlocation.getLatitude (), lastlocation.getLongitude (), mcdonalds);
                     dataTransfer[0] = mMap;
                     dataTransfer[1] = url;
@@ -306,27 +345,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde mcdonalds", Toast.LENGTH_SHORT).show ();
                 }
                 break;
-            case R.id.B_urinoir:
-                if(Searchlocation !=null) {
-                    mMap.clear ();
-                    String urinoir = "urinal";
-                    String url = getUrl (lat, lng, urinoir);
-                    dataTransfer[0] = mMap;
-                    dataTransfer[1] = url;
-                    getNearbyPlacesData.execute (dataTransfer);
-                    Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde urinoir in "+ Searchlocation, Toast.LENGTH_SHORT).show ();
-                }else {
-                    mMap.clear ();
-                    String urinoir = "urinal";
-                    String url = getUrl (lastlocation.getLatitude (), lastlocation.getLongitude (), urinoir);
-                    dataTransfer[0] = mMap;
-                    dataTransfer[1] = url;
-                    getNearbyPlacesData.execute (dataTransfer);
-                    Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde urinoir`s", Toast.LENGTH_SHORT).show ();
-                }
-                break;
             case R.id.B_loo:
-                if(Searchlocation !="") {
+                if(!Searchlocation.isEmpty ()) {
                     mMap.clear ();
                     String loo = "public toilet";
                     String url = getUrl (lat, lng, loo);
@@ -334,7 +354,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     dataTransfer[1] = url;
                     getNearbyPlacesData.execute (dataTransfer);
                     Toast.makeText (MapsActivity.this, "Toon dichtsbijzijnde public toilet in "+ Searchlocation, Toast.LENGTH_SHORT).show ();
-                }else {
+                }
+                if(Searchlocation.isEmpty ()) {
                     mMap.clear ();
                     String loo = "public toilet";
                     String url = getUrl (lastlocation.getLatitude (), lastlocation.getLongitude (), loo);
@@ -363,14 +384,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onConnected(@Nullable Bundle bundle){
+        requestLocationUpdates();
+    }
+
+    public void requestLocationUpdates() {
         locationRequest = new LocationRequest();
-        locationRequest.setInterval(1000);
-        locationRequest.setFastestInterval(1000);
+        locationRequest.setInterval(120000);
+        locationRequest.setFastestInterval(120000);
         locationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-            LocationServices.FusedLocationApi.requestLocationUpdates(client, locationRequest, this);
+            mFusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper());
         }
     }
 
