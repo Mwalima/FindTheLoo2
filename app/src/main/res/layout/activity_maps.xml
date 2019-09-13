@@ -45,7 +45,7 @@
         android:layout_below="@+id/B_loo"
         android:layout_alignParentStart="true"
         android:layout_alignParentBottom="true"
-        tools:context="com.apps.mapwithmarker.MapsActivity" />
+        tools:context="com.application.mapwithmarker.MapsActivity" />
 
     <Button
         android:id="@+id/B_loo"

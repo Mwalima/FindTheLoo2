@@ -1,4 +1,4 @@
-package com.apps.mwalima.findtheloo;
+package com.application.mwalima.findtheloo2;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

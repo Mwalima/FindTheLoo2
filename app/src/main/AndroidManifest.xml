@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.apps.mwalima.findtheloo">
+    package="com.application.mwalima.findtheloo2">
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -40,7 +40,7 @@
             android:value="AIzaSyBxo_Umr5453x5ij04DVw-euVKNHxSEWPc" />
 
         <activity
-            android:name=".MapsActivity"
+            android:name="com.application.mwalima.findtheloo2.MapsActivity"
             android:label="@string/title_activity_maps">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
